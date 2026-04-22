@@ -1,56 +1,26 @@
 import streamlit as st
-from auth import logout
 
+def doctor_dashboard():
 
-# -----------------------
-# DUMMY USERS DATABASE
-# -----------------------
-USERS = {
-    "patient@test.com": {
-        "password": "1234",
-        "role": "patient",
-        "name": "John Doe"
-    },
-    "doctor@test.com": {
-        "password": "1234",
-        "role": "doctor",
-        "name": "Dr. Smith"
-    }
-}
+    st.title("Doctor Dashboard 👨‍⚕️")
 
+    if "appointments" not in st.session_state:
+        st.session_state.appointments = []
 
-# -----------------------
-# LOGIN FUNCTION
-# -----------------------
-def login():
+    st.subheader("Today's Appointments")
 
-    st.markdown("## 🏥 DocTime Login")
-
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-
-    if st.button("Login"):
-
-        if email in USERS and USERS[email]["password"] == password:
-
-            st.session_state.logged_in = True
-            st.session_state.role = USERS[email]["role"]
-            st.session_state.user = USERS[email]
-
-            st.success("Login successful ✔")
-            st.rerun()
-
-        else:
-            st.error("Invalid email or password")
-
-
-# -----------------------
-# LOGOUT
-# -----------------------
-def logout():
-    st.session_state.logged_in = False
-    st.session_state.role = None
-    st.session_state.user = None
-    st.rerun()
-if st.sidebar.button("Logout"):
-    logout()
+    if st.session_state.appointments:
+        for appt in st.session_state.appointments:
+            st.markdown(f"""
+            <div style="
+                background:white;
+                padding:12px;
+                border-radius:10px;
+                margin-bottom:10px;
+            ">
+                Patient: {appt}<br>
+                Time: 10:00 AM
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("No appointments yet.")
