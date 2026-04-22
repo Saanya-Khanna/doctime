@@ -12,19 +12,20 @@ def patient_dashboard():
         if st.button("Logout"):
             logout()
 
-    st.title("Find Doctors")
+def search_doctors(doctors, specialty, zipcode):
 
-    # SEARCH FILTERS
-    col1, col2 = st.columns(2)
+    results = []
 
-    specialty = col1.selectbox(
-        "Specialty",
-        ["All", "Cardiologist", "Dermatologist", "Pediatrician", "Neurologist"]
-    )
+    for doc in doctors:
 
-    zipcode = col2.text_input("Zip Code")
+        match_specialty = (specialty == "All" or doc["specialty"] == specialty)
+        match_zip = (zipcode == "" or zipcode in doc["zip"])
 
-    st.markdown("---")
+        if match_specialty and match_zip:
+            results.append(doc)
+
+    return results
+
 
     # REAL API CALL
     doctors = fetch_doctors(specialty, zipcode)
