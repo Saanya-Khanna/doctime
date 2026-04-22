@@ -1,17 +1,52 @@
 import streamlit as st
-from components.ui import load_css, card
 
-def doctor_dashboard():
+# -----------------------
+# DUMMY USERS DATABASE
+# -----------------------
+USERS = {
+    "patient@test.com": {
+        "password": "1234",
+        "role": "patient",
+        "name": "John Doe"
+    },
+    "doctor@test.com": {
+        "password": "1234",
+        "role": "doctor",
+        "name": "Dr. Smith"
+    }
+}
 
-    load_css()
 
-    st.title("Doctor Dashboard")
+# -----------------------
+# LOGIN FUNCTION
+# -----------------------
+def login():
 
-    menu = st.sidebar.radio("Menu", ["Dashboard", "Schedule"])
+    st.markdown("## 🏥 DocTime Login")
 
-    if menu == "Dashboard":
-        card("Today's Patients", "5 appointments")
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
 
-    elif menu == "Schedule":
-        st.write("Manage availability here")
+    if st.button("Login"):
 
+        if email in USERS and USERS[email]["password"] == password:
+
+            st.session_state.logged_in = True
+            st.session_state.role = USERS[email]["role"]
+            st.session_state.user = USERS[email]
+
+            st.success("Login successful ✔")
+            st.rerun()
+
+        else:
+            st.error("Invalid email or password")
+
+
+# -----------------------
+# LOGOUT
+# -----------------------
+def logout():
+    st.session_state.logged_in = False
+    st.session_state.role = None
+    st.session_state.user = None
+    st.rerun()
