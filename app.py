@@ -122,7 +122,7 @@ def patient_dashboard():
 
     if menu == "Dashboard":
         if "page" not in st.session_state:
-        st.session_state.page = "dashboard"
+            st.session_state.page = "dashboard"
 
 menu = st.session_state.page
 
