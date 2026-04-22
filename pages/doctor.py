@@ -7,8 +7,7 @@ def doctor_dashboard():
     load_css()
 
     with st.sidebar:
-        st.title("Doctor Portal")
-
+        st.title("Doctor")
         if st.button("Logout"):
             logout()
 
@@ -16,7 +15,7 @@ def doctor_dashboard():
 
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("Today", "5 appointments")
+    col1.metric("Appointments", "5")
     col2.metric("Patients", "32")
     col3.metric("Rating", "4.8 ⭐")
 
@@ -24,13 +23,14 @@ def doctor_dashboard():
 
     st.subheader("Today's Schedule")
 
-    if "appointments" in st.session_state and st.session_state.appointments:
+    if st.session_state.appointments:
 
         for a in st.session_state.appointments:
+
             st.markdown(f"""
             <div class="card">
                 Patient: John Doe<br>
-                Appointment: 10:00 AM
+                Appointment: {a['time']}
             </div>
             """, unsafe_allow_html=True)
 
