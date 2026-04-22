@@ -1,8 +1,5 @@
 import streamlit as st
 
-# -----------------------
-# DUMMY USERS DATABASE
-# -----------------------
 USERS = {
     "patient@test.com": {
         "password": "1234",
@@ -16,38 +13,34 @@ USERS = {
     }
 }
 
-
-# -----------------------
-# LOGIN FUNCTION
-# -----------------------
 def login():
 
-    st.markdown("## 🏥 DocTime Login")
+    st.markdown("## 🏥 DocTime")
 
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+    with st.container():
+        st.markdown("### Sign in")
 
-    if st.button("Login"):
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
 
-        if email in USERS and USERS[email]["password"] == password:
+        if st.button("Login"):
 
-            st.session_state.logged_in = True
-            st.session_state.role = USERS[email]["role"]
-            st.session_state.user = USERS[email]
+            user = USERS.get(email)
 
-            st.success("Login successful ✔")
-            st.rerun()
+            if user and user["password"] == password:
 
-        else:
-            st.error("Invalid email or password")
+                st.session_state.logged_in = True
+                st.session_state.role = user["role"]
+                st.session_state.user = user
+
+                st.rerun()
+
+            else:
+                st.error("Invalid credentials")
 
 
-# -----------------------
-# LOGOUT
-# -----------------------
 def logout():
     st.session_state.logged_in = False
     st.session_state.role = None
     st.session_state.user = None
     st.rerun()
-
