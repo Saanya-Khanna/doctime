@@ -14,27 +14,51 @@ if "patient_tab" not in st.session_state:
 def sidebar():
 
     with st.sidebar:
-        st.title("🏥 DocTime")
 
-        if st.button("📊 Dashboard"):
-            st.session_state.patient_tab = "Dashboard"
+        # -----------------------
+        # BRAND
+        # -----------------------
+        st.markdown("""
+        <div style="padding:12px 0 18px 0;">
+            <div style="font-size:18px; font-weight:600; color:#0F172A;">
+                DocTime
+            </div>
+            <div style="font-size:12px; color:#64748B;">
+                Healthcare platform
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-        if st.button("🔍 Find Doctors"):
-            st.session_state.patient_tab = "Find"
+        st.markdown("<hr style='border:0.5px solid #E2E8F0;'>", unsafe_allow_html=True)
 
-        if st.button("📅 Appointments"):
-            st.session_state.patient_tab = "Appointments"
+        # -----------------------
+        # NAV SECTION
+        # -----------------------
+        st.markdown("### Navigation")
 
-        if st.button("👤 Profile"):
-            st.session_state.patient_tab = "Profile"
+        def nav(label, value):
+            if st.button(label, use_container_width=True):
+                st.session_state.patient_tab = value
 
-        if st.button("⚙️ Settings"):
-            st.session_state.patient_tab = "Settings"
+        nav("Dashboard", "Dashboard")
+        nav("Find Doctors", "Find")
+        nav("Appointments", "Appointments")
 
         st.markdown("---")
 
-        if st.button("🚪 Logout"):
+        st.markdown("### Account")
+
+        nav("Profile", "Profile")
+        nav("Settings", "Settings")
+
+        st.markdown("---")
+
+        # -----------------------
+        # LOGOUT (SUBTLE)
+        # -----------------------
+        if st.button("Logout", use_container_width=True):
             logout()
+
 
 def patient_dashboard():
 
@@ -105,6 +129,47 @@ def find_doctors_view():
 
                 st.session_state.selected_doctor = doc
                 st.session_state.patient_tab = "DoctorView"
+                
+def doctor_profile_view():
+
+    doc = st.session_state.selected_doctor
+
+    if not doc:
+        st.session_state.patient_tab = "Find"
+        return
+
+    if st.button("← Back"):
+        st.session_state.patient_tab = "Find"
+        return
+
+    st.markdown(f"""
+    <div class="card">
+        <h2>Dr. {doc['name']}</h2>
+        <p>{doc['specialty']} • 📍 {doc['zip']}</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("### Available Times")
+
+    schedule = get_availability(doc["id"])
+
+    for slot in schedule:
+
+        st.markdown(f"""
+        <div class="card">
+            {slot['day']} — {slot['time']}
+        </div>
+        """, unsafe_allow_html=True)
+
+        if st.button(f"Book {slot['time']}", key=f"{doc['id']}-{slot['day']}-{slot['time']}"):
+
+            st.session_state.appointments.append({
+                "doctor": doc["name"],
+                "time": f"{slot['day']} {slot['time']}"
+            })
+
+            st.success("Booked ✔")
+            st.session_state.patient_tab = "Appointments"
 
 # -----------------------
 # DOCTOR AVAILABILITY VIEW
@@ -178,13 +243,36 @@ def profile_view():
 
     st.title("Profile")
 
-    st.markdown(f"""
-    <div style="background:white;padding:16px;border-radius:14px;">
-        Name: John Doe<br>
-        Role: Patient<br>
-        Email: patient@test.com
+    user = st.session_state.user
+
+    if "profile_name" not in st.session_state:
+        st.session_state.profile_name = user["name"]
+
+    st.markdown("""
+    <div class="card">
+        <h4>Personal Information</h4>
     </div>
     """, unsafe_allow_html=True)
+
+    name = st.text_input("Name", st.session_state.profile_name)
+    email = st.text_input("Email", "patient@test.com")
+
+    if st.button("Save Changes"):
+
+        st.session_state.profile_name = name
+
+        st.success("Profile updated ✔")
+
+    st.markdown("---")
+
+    st.markdown("""
+    <div class="card">
+        <h4>Account Info</h4>
+        <p>Role: Patient</p>
+        <p>Status: Active</p>
+    </div>
+    """, unsafe_allow_html=True)
+
 
 # -----------------------
 # SETTINGS VIEW
@@ -193,7 +281,31 @@ def settings_view():
 
     st.title("Settings")
 
-    st.info("Settings page (expand later with notifications, privacy, etc.)")
+    st.markdown("""
+    <div class="card">
+        <h4>Preferences</h4>
+    </div>
+    """, unsafe_allow_html=True)
+
+    notifications = st.toggle("Enable Notifications", value=True)
+    dark_mode = st.toggle("Dark Mode (demo)", value=False)
+
+    st.markdown("---")
+
+    st.markdown("""
+    <div class="card">
+        <h4>Privacy</h4>
+        <p>Manage how your data is used in the app.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.selectbox(
+        "Data Sharing",
+        ["Minimal", "Standard", "Full (for better recommendations)"]
+    )
+
+    st.success("Settings are saved automatically (demo behavior)")
+
 
 # -----------------------
 # MAIN ROUTER
@@ -202,7 +314,7 @@ def patient_dashboard():
 
     sidebar()
 
-    tab = st.session_state.patient_tab
+    
 
     if tab == "Dashboard":
         dashboard_view()
