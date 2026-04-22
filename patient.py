@@ -1,32 +1,38 @@
 import streamlit as st
-from auth import logout
-
-from components.ui import load_css, card
 
 def patient_dashboard():
-
-    load_css()
-
-    if st.sidebar.button("Logout"):
-    logout()
 
     st.title("Patient Dashboard")
 
     if "appointments" not in st.session_state:
         st.session_state.appointments = []
 
-    menu = st.sidebar.radio("Menu", ["Dashboard", "Search", "Appointments"])
+    specialty = st.selectbox(
+        "Specialty",
+        ["All", "Cardiologist", "Dermatologist", "Pediatrician"]
+    )
 
-    if menu == "Dashboard":
-        card("Book Appointment", "Find doctors near you")
+    zipcode = st.text_input("Zip Code")
 
-    elif menu == "Search":
-        st.subheader("Search Doctors")
+    doctors = [
+        {"name": "Dr. Sarah", "specialty": "Cardiologist", "zip": "76013"},
+        {"name": "Dr. Mike", "specialty": "Dermatologist", "zip": "75001"},
+        {"name": "Dr. Priya", "specialty": "Pediatrician", "zip": "75201"},
+    ]
 
-        if st.button("Book Dr. Smith"):
-            st.session_state.appointments.append("Dr. Smith at 10AM")
+    st.subheader("Doctors")
 
-    elif menu == "Appointments":
-        for a in st.session_state.appointments:
-            card("Appointment", a)
+    for doc in doctors:
 
+        if (specialty == "All" or doc["specialty"] == specialty) and (zipcode == "" or doc["zip"] == zipcode):
+
+            st.markdown(f"""
+            <div style="padding:12px; background:white; border-radius:10px; margin-bottom:10px;">
+                <b>{doc['name']}</b><br>
+                {doc['specialty']} • {doc['zip']}
+            </div>
+            """, unsafe_allow_html=True)
+
+            if st.button(f"Book {doc['name']}", key=doc["name"]):
+                st.session_state.appointments.append(doc["name"])
+                st.success("Booked!")
