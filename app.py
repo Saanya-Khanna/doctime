@@ -126,8 +126,8 @@ def patient_dashboard():
 
 menu = st.session_state.page
 
-    elif menu == "Search Doctors":
-        st.subheader("🔍 Find a Doctor")
+elif menu == "Search Doctors":
+    st.subheader("🔍 Find a Doctor")
 
         col1, col2 = st.columns(2)
         specialty = col1.selectbox("Specialty", ["All", "Cardiologist", "Dermatologist", "Pediatrician"])
