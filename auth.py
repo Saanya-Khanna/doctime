@@ -15,10 +15,7 @@ USERS = {
 
 def login():
 
-    st.markdown("""
-    <h1 style='text-align:center;'>🏥 DocTime</h1>
-    <p style='text-align:center;color:gray;'>Book doctors instantly</p>
-    """, unsafe_allow_html=True)
+    st.markdown("## 🏥 DocTime")
 
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
@@ -36,7 +33,8 @@ def login():
             st.rerun()
 
         else:
-            st.error("Invalid login")
+            st.error("Invalid credentials")
+
 
 def logout():
     st.session_state.logged_in = False
