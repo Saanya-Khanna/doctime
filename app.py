@@ -1,15 +1,29 @@
 import streamlit as st
+
+from auth import login
 from patient import patient_dashboard
 from doctor import doctor_dashboard
 
 st.set_page_config(page_title="DocTime", layout="wide")
 
-# SESSION STATE
-if "user_type" not in st.session_state:
-    st.session_state.user_type = "patient"
+# -----------------------
+# SESSION INIT
+# -----------------------
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
-# ROUTING
-if st.session_state.user_type == "patient":
-    patient_dashboard()
+if "role" not in st.session_state:
+    st.session_state.role = None
+
+
+# -----------------------
+# APP ROUTING
+# -----------------------
+if not st.session_state.logged_in:
+    login()
+
 else:
-    doctor_dashboard()
+    if st.session_state.role == "patient":
+        patient_dashboard()
+    else:
+        doctor_dashboard()
