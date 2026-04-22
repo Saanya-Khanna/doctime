@@ -1,200 +1,236 @@
 import streamlit as st
 
+# -----------------------
+# PAGE CONFIG
+# -----------------------
 st.set_page_config(page_title="DocTime", layout="wide")
 
 # -----------------------
-# STYLING (BRIGHT UI)
+# SESSION STATE INIT
+# -----------------------
+if "user_type" not in st.session_state:
+    st.session_state.user_type = "patient"  # default
+
+if "appointments" not in st.session_state:
+    st.session_state.appointments = []
+
+# -----------------------
+# STYLING
 # -----------------------
 st.markdown("""
 <style>
-body {
-    background-color: #f8fbff;
-}
 .card {
-    background-color: white;
+    background: white;
     padding: 18px;
     border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     margin-bottom: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
-.title {
-    font-size: 26px;
-    font-weight: 600;
-}
-.small {
-    color: gray;
-    font-size: 14px;
+body {
+    background-color: #f6f9fc;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # -----------------------
-# DATA (MORE REALISTIC)
+# LAYOUT (SIDEBAR + HEADER)
 # -----------------------
-doctors = [
-    {"id": 1, "name": "Dr. Sarah Johnson", "specialty": "Cardiologist", "zip": "76013"},
-    {"id": 2, "name": "Dr. Michael Lee", "specialty": "Dermatologist", "zip": "75001"},
-    {"id": 3, "name": "Dr. Priya Patel", "specialty": "Pediatrician", "zip": "75201"},
-    {"id": 4, "name": "Dr. James Wilson", "specialty": "Orthopedic", "zip": "76010"},
-    {"id": 5, "name": "Dr. Emily Chen", "specialty": "Neurologist", "zip": "75080"},
-    {"id": 6, "name": "Dr. David Kim", "specialty": "Cardiologist", "zip": "75204"},
-    {"id": 7, "name": "Dr. Lisa Wong", "specialty": "Dermatologist", "zip": "76015"},
-    {"id": 8, "name": "Dr. Ahmed Khan", "specialty": "Pediatrician", "zip": "75013"},
-]
+def layout(title):
+    with st.sidebar:
+        st.markdown("## 🏥 DocTime")
 
-availability = {
-    1: ["10:00 AM", "2:00 PM"],
-    2: ["9:00 AM", "3:00 PM"],
-    3: ["11:00 AM"],
-    4: ["1:00 PM"],
-    5: ["12:00 PM"],
-    6: ["4:00 PM"],
-    7: ["10:30 AM"],
-    8: ["2:30 PM"],
-}
+        # Toggle user type (for demo)
+        st.session_state.user_type = st.selectbox(
+            "Switch Role",
+            ["patient", "doctor"],
+            index=0 if st.session_state.user_type == "patient" else 1
+        )
 
-# -----------------------
-# SESSION STATE
-# -----------------------
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "user_type" not in st.session_state:
-    st.session_state.user_type = None
-if "appointments" not in st.session_state:
-    st.session_state.appointments = []
-if "page" not in st.session_state:
-    st.session_state.page = "Dashboard"
+        if st.session_state.user_type == "patient":
+            menu = st.radio("", [
+                "🏠 Dashboard",
+                "🔍 Search Doctors",
+                "📅 My Appointments",
+                "👤 Profile",
+                "🚪 Logout"
+            ])
+        else:
+            menu = st.radio("", [
+                "🏠 Dashboard",
+                "📅 Schedule",
+                "⏰ Availability",
+                "👤 Profile",
+                "🚪 Logout"
+            ])
 
-# -----------------------
-# LOGIN
-# -----------------------
-def login():
-    st.title("🏥 DocTime")
-
-    col1, col2 = st.columns(2)
-
+    # Header
+    col1, col2 = st.columns([8, 2])
     with col1:
-        st.subheader("Patient Login")
-        if st.button("Login as Patient"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "patient"
-            st.session_state.page = "Dashboard"
-            st.rerun()
-
+        st.markdown(f"### {title}")
     with col2:
-        st.subheader("Doctor Login")
-        if st.button("Login as Doctor"):
-            st.session_state.logged_in = True
-            st.session_state.user_type = "doctor"
-            st.session_state.page = "Dashboard"
-            st.rerun()
+        st.markdown("🔔 👤")
+
+    return menu
 
 # -----------------------
-# NAVBAR
+# PATIENT DASHBOARD
 # -----------------------
-def navbar():
-    cols = st.columns([1,1,1,1,1])
+def patient_dashboard():
+    menu = layout("Patient Dashboard")
 
-    if cols[0].button("Dashboard"):
-        st.session_state.page = "Dashboard"
-    if cols[1].button("Search"):
-        st.session_state.page = "Search"
-    if cols[2].button("Appointments"):
-        st.session_state.page = "Appointments"
-    if cols[3].button("Profile"):
-        st.session_state.page = "Profile"
-    if cols[4].button("Logout"):
-        st.session_state.logged_in = False
+    if menu == "🏠 Dashboard":
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.markdown("""
+            <div class="card">
+            <h4>📅 Book Appointment</h4>
+            <p>Schedule a new visit</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col2:
+            st.markdown(f"""
+            <div class="card">
+            <h2>{len(st.session_state.appointments)}</h2>
+            <p>Upcoming Appointments</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col3:
+            st.markdown("""
+            <div class="card">
+            <h2>3</h2>
+            <p>Completed Visits</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col4:
+            st.markdown("""
+            <div class="card">
+            <h2>5</h2>
+            <p>Saved Doctors</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.subheader("Upcoming Appointments")
+
+        if st.session_state.appointments:
+            for appt in st.session_state.appointments:
+                st.markdown(f"""
+                <div class="card">
+                <b>{appt['doctor']}</b><br>
+                {appt['time']} • Confirmed
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("No appointments yet.")
+
+    elif menu == "🔍 Search Doctors":
+        st.subheader("Find a Doctor")
+
+        doctors = ["Dr. Sarah Johnson", "Dr. Michael Lee", "Dr. Priya Patel"]
+
+        for doc in doctors:
+            if st.button(f"Book Appointment with {doc}"):
+                st.session_state.appointments.append({
+                    "doctor": doc,
+                    "time": "10:00 AM"
+                })
+                st.success("Appointment booked!")
+
+    elif menu == "📅 My Appointments":
+        st.subheader("Your Appointments")
+
+        if st.session_state.appointments:
+            for appt in st.session_state.appointments:
+                st.markdown(f"""
+                <div class="card">
+                {appt['doctor']} at {appt['time']}
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("No appointments.")
+
+    elif menu == "👤 Profile":
+        st.markdown("""
+        <div class="card">
+        <h4>Profile</h4>
+        <p>Name: John Doe</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    elif menu == "🚪 Logout":
+        st.session_state.user_type = "patient"
+        st.session_state.appointments = []
         st.rerun()
 
 # -----------------------
-# DASHBOARD
+# DOCTOR DASHBOARD
 # -----------------------
-def dashboard():
-    st.markdown('<div class="title">Welcome 👋</div>', unsafe_allow_html=True)
+def doctor_dashboard():
+    menu = layout("Doctor Dashboard")
 
-    if st.session_state.appointments:
-        latest = st.session_state.appointments[-1]
+    if menu == "🏠 Dashboard":
+        col1, col2, col3 = st.columns(3)
 
-        st.markdown(f"""
-        <div class="card">
-        <h4>📅 Upcoming Appointment</h4>
-        <p>{latest['doctor']} at {latest['time']}</p>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.info("No upcoming appointments")
-
-# -----------------------
-# SEARCH DOCTORS
-# -----------------------
-def search():
-    st.subheader("🔍 Search Doctors")
-
-    specialty = st.selectbox("Specialty", ["All"] + list(set(d["specialty"] for d in doctors)))
-    zip_code = st.text_input("Zip Code")
-
-    for doc in doctors:
-        if (specialty == "All" or doc["specialty"] == specialty) and (zip_code == "" or doc["zip"] == zip_code):
-
-            st.markdown(f"""
+        with col1:
+            st.markdown("""
             <div class="card">
-                <b>{doc['name']}</b><br>
-                {doc['specialty']} • {doc['zip']}
+            <h2>5</h2>
+            <p>Today's Appointments</p>
             </div>
             """, unsafe_allow_html=True)
 
-            for time in availability[doc["id"]]:
-                if st.button(f"Book {time}", key=f"{doc['id']}{time}"):
-                    st.session_state.appointments.append({
-                        "doctor": doc["name"],
-                        "time": time
-                    })
-                    st.success("Appointment Booked!")
-                    st.rerun()
-
-# -----------------------
-# APPOINTMENTS
-# -----------------------
-def appointments():
-    st.subheader("📅 My Appointments")
-
-    if st.session_state.appointments:
-        for appt in st.session_state.appointments:
-            st.markdown(f"""
+        with col2:
+            st.markdown("""
             <div class="card">
-            {appt['doctor']} at {appt['time']}
+            <h2>12</h2>
+            <p>Total Patients</p>
             </div>
             """, unsafe_allow_html=True)
-    else:
-        st.info("No appointments yet")
+
+        with col3:
+            st.markdown("""
+            <div class="card">
+            <h2>4.8 ⭐</h2>
+            <p>Rating</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.subheader("Today's Schedule")
+
+        if st.session_state.appointments:
+            for appt in st.session_state.appointments:
+                st.markdown(f"""
+                <div class="card">
+                <b>Patient</b><br>
+                Appointment at {appt['time']}
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("No appointments today")
+
+    elif menu == "📅 Schedule":
+        st.write("Schedule page")
+
+    elif menu == "⏰ Availability":
+        new_time = st.text_input("Add time slot")
+
+        if st.button("Add"):
+            st.success(f"Added {new_time}")
+
+    elif menu == "👤 Profile":
+        st.write("Doctor profile")
+
+    elif menu == "🚪 Logout":
+        st.session_state.user_type = "patient"
+        st.rerun()
 
 # -----------------------
-# PROFILE
+# MAIN ENTRY
 # -----------------------
-def profile():
-    st.subheader("👤 Profile")
-
-    st.markdown("""
-    <div class="card">
-    Name: John Doe <br>
-    Email: demo@doctime.com
-    </div>
-    """, unsafe_allow_html=True)
-
-# -----------------------
-# MAIN
-# -----------------------
-if not st.session_state.logged_in:
-    login()
+if st.session_state.user_type == "patient":
+    patient_dashboard()
 else:
-    navbar()
-
-    if st.session_state.page == "Dashboard":
-        dashboard()
-    elif st.session_state.page == "Search":
-        search()
-    elif st.session_state.page == "Appointments":
-        appointments()
-    elif st.session_state.page == "Profile":
-        profile()
+    doctor_dashboard()
