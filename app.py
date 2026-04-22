@@ -1,4 +1,93 @@
 import streamlit as st
+
+# -----------------------
+# PAGE CONFIG
+# -----------------------
+st.set_page_config(page_title="DocTime", layout="wide")
+
+# -----------------------
+# STYLING
+# -----------------------
+st.markdown("""
+<style>
+    .card {
+        background-color: #f0f2f6;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# -----------------------
+# SAMPLE DATA
+# -----------------------
+doctors = [
+    {"id": 1, "name": "Dr. Sarah Johnson", "specialty": "Cardiologist", "zip": "10001"},
+    {"id": 2, "name": "Dr. James Smith", "specialty": "Dermatologist", "zip": "10002"},
+    {"id": 3, "name": "Dr. Emily Brown", "specialty": "Pediatrician", "zip": "10001"},
+    {"id": 4, "name": "Dr. Michael Lee", "specialty": "Cardiologist", "zip": "10003"},
+]
+
+availability = [
+    {"doctor_id": 1, "time": "10:00 AM"},
+    {"doctor_id": 1, "time": "2:00 PM"},
+    {"doctor_id": 2, "time": "9:00 AM"},
+    {"doctor_id": 2, "time": "3:00 PM"},
+    {"doctor_id": 3, "time": "11:00 AM"},
+    {"doctor_id": 4, "time": "1:00 PM"},
+]
+
+# -----------------------
+# HELPER FUNCTION
+# -----------------------
+def header(title):
+    st.title(title)
+
+# -----------------------
+# SESSION STATE INITIALIZATION
+# -----------------------
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "user_type" not in st.session_state:
+    st.session_state.user_type = None
+if "user" not in st.session_state:
+    st.session_state.user = {}
+if "appointments" not in st.session_state:
+    st.session_state.appointments = []
+
+# -----------------------
+# LOGIN PAGE
+# -----------------------
+def login_page():
+    st.title("🏥 DocTime - Healthcare Appointment System")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("👤 Patient Login")
+        patient_email = st.text_input("Patient Email", key="patient_email")
+        if st.button("Login as Patient"):
+            if patient_email:
+                st.session_state.logged_in = True
+                st.session_state.user_type = "patient"
+                st.session_state.user = {"name": patient_email.split("@")[0].title()}
+                st.rerun()
+            else:
+                st.error("Please enter email")
+    
+    with col2:
+        st.subheader("👨‍⚕️ Doctor Login")
+        doctor_email = st.text_input("Doctor Email", key="doctor_email")
+        if st.button("Login as Doctor"):
+            if doctor_email:
+                st.session_state.logged_in = True
+                st.session_state.user_type = "doctor"
+                st.session_state.user = {"name": doctor_email.split("@")[0].title()}
+                st.rerun()
+            else:
+                st.error("Please enter email")
+
 # -----------------------
 # PATIENT DASHBOARD
 # -----------------------
@@ -116,3 +205,16 @@ def doctor_dashboard():
     elif menu == "Logout":
         st.session_state.logged_in = False
         st.rerun()
+
+
+# -----------------------
+# MAIN APP
+# -----------------------
+if __name__ == "__main__":
+    if not st.session_state.logged_in:
+        login_page()
+    else:
+        if st.session_state.user_type == "patient":
+            patient_dashboard()
+        else:
+            doctor_dashboard()
