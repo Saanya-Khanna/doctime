@@ -1,7 +1,7 @@
 import streamlit as st
 from auth import login
-from patient import patient_dashboard
-from doctor import doctor_dashboard
+from pages.patient import patient_dashboard
+from pages.doctor import doctor_dashboard
 from components.ui import load_css
 
 st.set_page_config(page_title="DocTime", layout="wide")
