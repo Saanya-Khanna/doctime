@@ -1,7 +1,20 @@
 import streamlit as st
 from auth import logout
-from api import fetch_doctors
+from api import DOCTORS, get_availability
 from components.ui import load_css, doctor_card
+from datetime import datetime
+
+def search_doctors(doctors, specialty, zipcode):
+
+    results = []
+
+    for doc in doctors:
+
+        if (specialty == "All" or doc["specialty"] == specialty) and (zipcode == "" or zipcode in doc["zip"]):
+            results.append(doc)
+
+    return results
+
 
 def patient_dashboard():
 
@@ -12,53 +25,66 @@ def patient_dashboard():
         if st.button("Logout"):
             logout()
 
-def search_doctors(doctors, specialty, zipcode):
+    st.title("Find Doctors")
 
-    results = []
+    # SEARCH BAR
+    col1, col2 = st.columns(2)
 
-    for doc in doctors:
+    specialty = col1.selectbox(
+        "Specialty",
+        ["All", "Cardiologist", "Dermatologist", "Pediatrician"]
+    )
 
-        match_specialty = (specialty == "All" or doc["specialty"] == specialty)
-        match_zip = (zipcode == "" or zipcode in doc["zip"])
+    zipcode = col2.text_input("Zip Code")
 
-        if match_specialty and match_zip:
-            results.append(doc)
+    # SEARCH BUTTON (IMPORTANT FOR UX)
+    if st.button("Search Doctors"):
 
-    return results
+        results = search_doctors(DOCTORS, specialty, zipcode)
 
+        st.session_state.results = results
 
-    # REAL API CALL
-    doctors = fetch_doctors(specialty, zipcode)
+    # SHOW RESULTS
+    if "results" in st.session_state:
 
-    if not doctors:
-        st.info("No doctors found. Try different filters.")
-        return
+        for doc in st.session_state.results:
 
-    st.subheader(f"Available Doctors ({len(doctors)})")
+            doctor_card(doc["name"], doc["specialty"], doc["zip"])
 
-    # DISPLAY DOCTORS
-    for doc in doctors:
+            # CLICK DOCTOR → SHOW PROFILE STYLE VIEW
+            if st.button(f"View Availability - {doc['name']}", key=doc["id"]):
 
-        doctor_card(doc["name"], doc["specialty"], doc["zip"])
+                st.session_state.selected_doctor = doc
 
-        if st.button(f"Book {doc['name']}", key=doc["name"]):
+    # -----------------------
+    # DOCTOR DETAIL VIEW
+    # -----------------------
+    if "selected_doctor" in st.session_state:
 
-            st.session_state.appointments.append({
-                "doctor": doc["name"],
-                "time": "10:00 AM (demo)"
-            })
+        doc = st.session_state.selected_doctor
 
-            st.success("Appointment booked ✔")
+        st.markdown("---")
+        st.subheader(f"{doc['name']} - Availability")
 
-    st.markdown("---")
+        schedule = get_availability(doc["id"])
 
-    # APPOINTMENTS
-    st.subheader("Your Appointments")
+        for slot in schedule:
 
-    for a in st.session_state.appointments:
-        st.markdown(f"""
-        <div class="card">
-            <b>{a['doctor']}</b><br>
-            {a['time']}
-        </div>
-        """, unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="card">
+                📅 {slot['day']}<br>
+                ⏰ {slot['time']}
+            </div>
+            """, unsafe_allow_html=True)
+
+            if st.button(f"Book {slot['time']}", key=f"{doc['id']}-{slot['time']}-{slot['day']}"):
+
+                if "appointments" not in st.session_state:
+                    st.session_state.appointments = []
+
+                st.session_state.appointments.append({
+                    "doctor": doc["name"],
+                    "time": f"{slot['day']} {slot['time']}"
+                })
+
+                st.success("Appointment booked ✔")
