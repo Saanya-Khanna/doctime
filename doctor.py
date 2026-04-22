@@ -1,4 +1,6 @@
 import streamlit as st
+from auth import logout
+
 
 # -----------------------
 # DUMMY USERS DATABASE
@@ -50,3 +52,5 @@ def logout():
     st.session_state.role = None
     st.session_state.user = None
     st.rerun()
+if st.sidebar.button("Logout"):
+    logout()
