@@ -8,17 +8,18 @@ st.set_page_config(page_title="DocTime", layout="wide")
 
 load_css()
 
-# INIT STATE
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if "role" not in st.session_state:
     st.session_state.role = None
 
+if "appointments" not in st.session_state:
+    st.session_state.appointments = []
+
 # ROUTING
 if not st.session_state.logged_in:
     login()
-
 else:
     if st.session_state.role == "patient":
         patient_dashboard()
