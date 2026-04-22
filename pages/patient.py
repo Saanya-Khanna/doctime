@@ -59,18 +59,6 @@ def sidebar():
         if st.button("Logout", use_container_width=True):
             logout()
 
-
-def patient_dashboard():
-
-    # -----------------------
-    # INIT SESSION STATE (FIX)
-    # -----------------------
-    if "patient_tab" not in st.session_state:
-        st.session_state.patient_tab = "Dashboard"
-
-    if "appointments" not in st.session_state:
-        st.session_state.appointments = []
-
 # -----------------------
 # DASHBOARD
 # -----------------------
@@ -312,24 +300,26 @@ def settings_view():
 # -----------------------
 def patient_dashboard():
 
-    sidebar()
+    # INIT (IMPORTANT)
+    if "patient_tab" not in st.session_state:
+        st.session_state.patient_tab = "Dashboard"
 
-    
+    tab = st.session_state.patient_tab   # ✅ THIS LINE IS MISSING IN YOUR CODE
 
-    if tab == "Dashboard":
-        dashboard_view()
+if tab == "Dashboard":
+    dashboard_view()
 
-    elif tab == "Find":
-        find_doctors_view()
+elif tab == "Find":
+    find_doctors_view()
 
-    elif tab == "DoctorView":
-        doctor_view()
+elif tab == "DoctorProfile":
+    doctor_profile_view()
 
-    elif tab == "Appointments":
-        appointments_view()
+elif tab == "Appointments":
+    appointments_view()
 
-    elif tab == "Profile":
-        profile_view()
+elif tab == "Profile":
+    profile_view()
 
-    elif tab == "Settings":
-        settings_view()
+elif tab == "Settings":
+    settings_view()
