@@ -5,18 +5,17 @@ def load_css():
     st.markdown("""
     <style>
 
-    /* =====================
-       GLOBAL BACKGROUND
-    ===================== */
+    /* =========================
+       APP BACKGROUND (SOFT SaaS)
+    ========================= */
     .stApp {
         background-color: #F8FAFC;
-        font-family: 'Inter', sans-serif;
-        color: #0F172A;
+        font-family: Inter, sans-serif;
     }
 
-    /* =====================
-       SIDEBAR (clean dark slate)
-    ===================== */
+    /* =========================
+       SIDEBAR (DARK MODERN)
+    ========================= */
     section[data-testid="stSidebar"] {
         background-color: #0B1220;
         color: #E2E8F0;
@@ -26,24 +25,25 @@ def load_css():
         color: #E2E8F0;
     }
 
-    /* =====================
-       HEADINGS
-    ===================== */
+    /* =========================
+       HEADINGS (CLEAN)
+    ========================= */
     h1, h2, h3 {
         font-weight: 600;
-        letter-spacing: -0.3px;
+        letter-spacing: -0.4px;
+        color: #0F172A;
     }
 
-    /* =====================
-       CARD (minimal + elegant)
-    ===================== */
+    /* =========================
+       CARD (Zocdoc STYLE)
+    ========================= */
     .card {
-        background: #FFFFFF;
+        background: white;
         border: 1px solid #E2E8F0;
         border-radius: 14px;
-        padding: 16px 18px;
+        padding: 16px;
         margin-bottom: 12px;
-        box-shadow: none;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         transition: all 0.2s ease;
     }
 
@@ -52,11 +52,11 @@ def load_css():
         transform: translateY(-1px);
     }
 
-    /* =====================
-       BUTTONS (subtle, not loud)
-    ===================== */
+    /* =========================
+       BUTTONS (SUBTLE PREMIUM)
+    ========================= */
     .stButton > button {
-        background: #0F172A;
+        background-color: #0F172A;
         color: white;
         border-radius: 10px;
         padding: 8px 14px;
@@ -66,29 +66,22 @@ def load_css():
     }
 
     .stButton > button:hover {
-        background: #1E293B;
+        background-color: #1E293B;
     }
 
-    /* =====================
-       METRICS (clean)
-    ===================== */
+    /* =========================
+       METRICS
+    ========================= */
     [data-testid="stMetric"] {
-        background: #FFFFFF;
+        background: white;
         border: 1px solid #E2E8F0;
-        padding: 12px;
         border-radius: 12px;
+        padding: 12px;
     }
 
-    /* =====================
-       TEXT MUTED
-    ===================== */
-    p {
-        color: #475569;
-    }
-
-    /* =====================
+    /* =========================
        REMOVE STREAMLIT CLUTTER
-    ===================== */
+    ========================= */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
