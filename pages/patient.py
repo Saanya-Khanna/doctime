@@ -1,6 +1,8 @@
 import streamlit as st
 from auth import logout
-from api import DOCTORS, get_availability
+import api
+DOCTORS = api.DOCTORS
+get_availability = api.get_availability
 from components.ui import load_css, doctor_card
 from datetime import datetime
 
