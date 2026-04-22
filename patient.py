@@ -1,9 +1,14 @@
 import streamlit as st
+from auth import logout
+
 from components.ui import load_css, card
 
 def patient_dashboard():
 
     load_css()
+
+    if st.sidebar.button("Logout"):
+    logout()
 
     st.title("Patient Dashboard")
 
