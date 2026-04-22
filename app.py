@@ -48,9 +48,15 @@ users = {
 }
 
 doctors = [
+doctors = [
     {"id": 1, "name": "Dr. Sarah Johnson", "specialty": "Cardiologist", "zip": "76013"},
     {"id": 2, "name": "Dr. Michael Lee", "specialty": "Dermatologist", "zip": "75001"},
     {"id": 3, "name": "Dr. Priya Patel", "specialty": "Pediatrician", "zip": "75201"},
+    {"id": 4, "name": "Dr. James Wilson", "specialty": "Orthopedic", "zip": "76010"},
+    {"id": 5, "name": "Dr. Emily Chen", "specialty": "Neurologist", "zip": "75080"},
+    {"id": 6, "name": "Dr. David Kim", "specialty": "Cardiologist", "zip": "75204"},
+    {"id": 7, "name": "Dr. Lisa Wong", "specialty": "Dermatologist", "zip": "76015"},
+    {"id": 8, "name": "Dr. Ahmed Khan", "specialty": "Pediatrician", "zip": "75013"},
 ]
 
 availability = [
@@ -116,23 +122,10 @@ def patient_dashboard():
     ])
 
     if menu == "Dashboard":
-        col1, col2 = st.columns(2)
+        if "page" not in st.session_state:
+        st.session_state.page = "dashboard"
 
-        with col1:
-            st.markdown("""
-            <div class="card">
-            <h4>📅 Upcoming Appointment</h4>
-            <p>Dr. Sarah Johnson • Tomorrow at 10:00 AM</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with col2:
-            st.markdown("""
-            <div class="card">
-            <h4>⚡ Quick Actions</h4>
-            <p>Search doctors and book appointments easily.</p>
-            </div>
-            """, unsafe_allow_html=True)
+menu = st.session_state.page
 
     elif menu == "Search Doctors":
         st.subheader("🔍 Find a Doctor")
@@ -195,9 +188,11 @@ def patient_dashboard():
 def doctor_dashboard():
     header(f"{st.session_state.user['name']} Dashboard 👨‍⚕️")
 
-    menu = st.sidebar.radio("Navigation", [
-        "Dashboard", "Appointments", "Availability", "Profile", "Logout"
-    ])
+menu = st.sidebar.selectbox(
+    "Navigation",
+    ["🏠 Dashboard", "🔍 Search Doctors", "📅 My Appointments", "👤 Profile", "🚪 Logout"]
+)
+    
 
     if menu == "Dashboard":
         st.markdown("""
