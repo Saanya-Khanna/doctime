@@ -300,26 +300,35 @@ def settings_view():
 # -----------------------
 def patient_dashboard():
 
-    # INIT (IMPORTANT)
+    # INIT STATE
     if "patient_tab" not in st.session_state:
         st.session_state.patient_tab = "Dashboard"
 
-    tab = st.session_state.patient_tab   # ✅ THIS LINE IS MISSING IN YOUR CODE
+    tab = st.session_state.patient_tab
 
-if tab == "Dashboard":
-    dashboard_view()
+    # -----------------------
+    # SIDEBAR MUST BE CALLED HERE
+    # -----------------------
+    sidebar()
 
-elif tab == "Find":
-    find_doctors_view()
+    # -----------------------
+    # ROUTER (MUST BE INSIDE FUNCTION)
+    # -----------------------
+    if tab == "Dashboard":
+        dashboard_view()
 
-elif tab == "DoctorProfile":
-    doctor_profile_view()
+    elif tab == "Find":
+        find_doctors_view()
 
-elif tab == "Appointments":
-    appointments_view()
+    elif tab == "DoctorView":
+        doctor_profile_view()
 
-elif tab == "Profile":
-    profile_view()
+    elif tab == "Appointments":
+        appointments_view()
 
-elif tab == "Settings":
-    settings_view()
+    elif tab == "Profile":
+        profile_view()
+
+    elif tab == "Settings":
+        settings_view()
+
