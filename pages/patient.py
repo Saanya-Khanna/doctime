@@ -1,36 +1,63 @@
-import requests
+import streamlit as st
+from auth import logout
+from api import fetch_doctors
+from components.ui import load_css, doctor_card
 
-def fetch_doctors(specialty, zipcode):
+def patient_dashboard():
 
-    url = "https://npiregistry.cms.hhs.gov/api/"
+    load_css()
 
-    params = {
-        "version": "2.1",
-        "limit": 10,
-        "enumeration_type": "NPI-1",
-    }
+    with st.sidebar:
+        st.title("Patient")
+        if st.button("Logout"):
+            logout()
 
-    # optional filters
-    if specialty != "All":
-        params["taxonomy_description"] = specialty
+    st.title("Find Doctors")
 
-    if zipcode:
-        params["postal_code"] = zipcode
+    # SEARCH FILTERS
+    col1, col2 = st.columns(2)
 
-    response = requests.get(url, params=params)
-    data = response.json()
+    specialty = col1.selectbox(
+        "Specialty",
+        ["All", "Cardiologist", "Dermatologist", "Pediatrician", "Neurologist"]
+    )
 
-    doctors = []
+    zipcode = col2.text_input("Zip Code")
 
-    for item in data.get("results", []):
+    st.markdown("---")
 
-        basic = item.get("basic", {})
-        addresses = item.get("addresses", [{}])
+    # REAL API CALL
+    doctors = fetch_doctors(specialty, zipcode)
 
-        doctors.append({
-            "name": " ".join(basic.get("first_name", "") + " " + basic.get("last_name", "")),
-            "specialty": basic.get("primary_taxonomy", {}).get("desc", "General"),
-            "zip": addresses[0].get("postal_code", "N/A")
-        })
+    if not doctors:
+        st.info("No doctors found. Try different filters.")
+        return
 
-    return doctors
+    st.subheader(f"Available Doctors ({len(doctors)})")
+
+    # DISPLAY DOCTORS
+    for doc in doctors:
+
+        doctor_card(doc["name"], doc["specialty"], doc["zip"])
+
+        if st.button(f"Book {doc['name']}", key=doc["name"]):
+
+            st.session_state.appointments.append({
+                "doctor": doc["name"],
+                "time": "10:00 AM (demo)"
+            })
+
+            st.success("Appointment booked ✔")
+
+    st.markdown("---")
+
+    # APPOINTMENTS
+    st.subheader("Your Appointments")
+
+    for a in st.session_state.appointments:
+        st.markdown(f"""
+        <div class="card">
+            <b>{a['doctor']}</b><br>
+            {a['time']}
+        </div>
+        """, unsafe_allow_html=True)
