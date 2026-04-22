@@ -1,10 +1,11 @@
 import streamlit as st
-from auth import logout
 import api
-DOCTORS = api.DOCTORS
-get_availability = api.get_availability
+from auth import logout
 from components.ui import load_css, doctor_card
 from datetime import datetime
+
+DOCTORS = api.DOCTORS
+get_availability = api.get_availability
 
 def search_doctors(doctors, specialty, zipcode):
 
