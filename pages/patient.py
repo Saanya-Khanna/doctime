@@ -36,6 +36,17 @@ def sidebar():
         if st.button("🚪 Logout"):
             logout()
 
+def patient_dashboard():
+
+    # -----------------------
+    # INIT SESSION STATE (FIX)
+    # -----------------------
+    if "patient_tab" not in st.session_state:
+        st.session_state.patient_tab = "Dashboard"
+
+    if "appointments" not in st.session_state:
+        st.session_state.appointments = []
+
 # -----------------------
 # DASHBOARD
 # -----------------------
